@@ -10,7 +10,7 @@ pipeline {
             steps {
                 // this step is required to make sure the script
                 // can be executed directly in a shell
-                sh('chmod +x ./algorithm.sh')
+                bat 'bash algorithms.sh'
             }
         }
         stage('Build') {
