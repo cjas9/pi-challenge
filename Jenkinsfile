@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Requirements') {
             steps {
-                bat '"C:\\Program Files\\Git\\bin\\bash.exe" algorithms.sh'
+                bat '"C:\\Program Files\\Git\\bin\\bash.exe" algorithm.sh'
             }
         }
         stage('Build') {
