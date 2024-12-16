@@ -8,22 +8,37 @@ pipeline {
     stages {
         stage('Requirements') {
             steps {
-                // this step is required to make sure the script
-                // can be executed directly in a shell
-                sh('chmod +x ./algorithm.sh')
+                script {
+                    if (isUnix()) {
+                        sh('chmod +x ./algorithm.sh')
+                    } else {
+                        bat('algorithm.bat') // Windows equivalent
+                    }
+                }
             }
         }
         stage('Build') {
             steps {
-                // the algorithm script creates a file named report.txt
-                sh('./algorithm.sh')
-
-                // this step archives the report
-                archiveArtifacts allowEmptyArchive: true,
-                    artifacts: '*.txt',
-                    fingerprint: true,
-                    onlyIfSuccessful: true
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                    sh('./algorithm.sh')
+                }
+                script {
+                    if (fileExists('report.txt')) {
+                        archiveArtifacts artifacts: '*.txt', fingerprint: true, onlyIfSuccessful: true
+                    } else {
+                        echo "No report.txt found to archive"
+                    }
+                }
             }
         }
     }
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Please check logs.'
+        }
+    }
 }
+
